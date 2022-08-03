@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+{% block title %}
+    {{title}}
+{% endblock %}
+</head>
+<body>
+{% block content %}
+{% for m in menu %}
+<a href="{{m.url}}">{{m.name}}</a>
+{% endfor %}
+{% endblock %}
+</body>
+</html>
