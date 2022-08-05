@@ -7,9 +7,8 @@
 {% endfor %}
 <form action="" method="post" class="form-contact">
 {{ form.hidden_tag() }}
-{{ form.name.label() }} {{ form.name() }}
-{{ form.psw.label() }} {{ form.psw() }}
+{{ form.title.label() }} {{ form.title() }}
+{{ form.body.label() }} {{ form.body() }}
 {{ form.submit() }}
 </form>
-<a href="{{url_for('password_change')}}">Забыли пароль?</a>
 {% endblock %}

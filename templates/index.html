@@ -3,4 +3,8 @@
 {% block content %}
 {{ super() }}
 <h1>Привет</h1>
+{% for post in posts %}
+<p class="title"><a href="{{ url_for('post_detail', url=post.url)}}">{{post.title}}</a></p>
+<p class="annonce">{{ post.body[:50] | striptags }}</p>
+{% endfor %}
 {% endblock %}

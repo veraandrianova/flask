@@ -1,0 +1,7 @@
+{% extends 'base.html' %}
+
+{% block content %}
+{{ super() }}
+<li>{{post.title}}</li>
+{{post.body}}
+{% endblock %}

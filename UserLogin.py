@@ -1,7 +1,10 @@
-class UserLogin():
-    def fromDB(self, user_id, db):
-        self.__user = db.User.query.filter_by(id=user_id)
-        print(self.__user)
+
+
+
+class UserLogin:
+    def fromDB(self, user_id, User):
+        self.__user = User.query.get(user_id)
+        print(self.__user, 'userloginfromdb')
         return self
 
     def create(self, user):
@@ -18,4 +21,7 @@ class UserLogin():
         return False
 
     def get_id(self):
-        return str(self.__user['id'])
+        print(self.__user, 'get')
+        return self.__user
+
+

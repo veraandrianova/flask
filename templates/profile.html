@@ -3,4 +3,5 @@
 {% block content %}
 {{ super() }}
 <h1>Привет, пользователь {{name}}</h1>
+<a href="{{url_for('logout')}}">Выйти</a>
 {% endblock %}
