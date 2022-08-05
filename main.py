@@ -16,6 +16,9 @@ db = SQLAlchemy(app)
 login_manager = LoginManager(app)
 login_manager.login_view = 'login'
 menu = [{"name": 'Главная страница', 'url': '/'},
+        {"name": 'Регистрация', 'url': 'register'},
+        {"name": 'Войти', 'url': 'login'},
+        {"name": 'Создать пост', 'url': 'create_posts'}
         ]
 
 
@@ -61,12 +64,6 @@ def load_user(user_id):
 @app.route('/')
 def index():
     posts = Posts.query.all()
-    print(posts)
-    menu_2 = [{"name": 'Регистрация', 'url': 'register'},
-        {"name": 'Войти', 'url': 'login'},
-        {"name": 'Создать пост', 'url': 'create_posts'}]
-    for i in menu_2:
-        menu.append(i)
     return render_template('index.html', title='О сайте', menu=menu, posts=posts)
 
 
@@ -105,11 +102,6 @@ def register():
         return redirect(url_for('login'))
     else:
         flash('Заполните корректно форму')
-    menu_2 = [
-        {"name": 'Войти', 'url': 'login'},
-        ]
-    for i in menu_2:
-        menu.append(i)
     return render_template('contact.html', title='Регистрация', menu=menu, form=form)
 
 
@@ -125,10 +117,8 @@ def login():
     if form.validate_on_submit():
         name = form.name.data
         user = User.query.filter_by(name=name).all()
-        print(user)
-        id = user[0].id
-        print(id)
         if len(user) > 0:
+            id = user[0].id
             cur_user = user[0]
             if cur_user.name == name:
                 if check_password_hash(cur_user.psw, form.psw.data):
@@ -136,13 +126,12 @@ def login():
                     print(userlogin)
                     login_user(userlogin)
                     return redirect(url_for('profile', name=name))
-
-        flash('Неверная пара логин/пароль')
+        else:
+            flash('Неверная пара логин/пароль')
     return render_template('login.html', menu=menu, title='Авторизация', form=form)
 
 
 @app.route('/password_change', methods=['POST', 'GET'])
-@login_required
 def password_change():
     form = PasswordChange()
     if form.validate_on_submit():
@@ -201,6 +190,14 @@ def create_posts():
 def post_detail(url):
     post = Posts.query.filter_by(url=url).first()
     return render_template('post_detail.html', menu=menu, title='Пост', post=post)
+
+@app.errorhandler(404)
+def pageNot(error):
+    return ("Страница не найдена", 404)
+
+@app.route('/transfer')
+def transfer():
+    return redirect(url_for('index'), 301)
 
 if __name__ == '__main__':
     app.run(debug=True)
