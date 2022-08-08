@@ -15,11 +15,12 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 login_manager = LoginManager(app)
 login_manager.login_view = 'login'
-menu = [{"name": 'Главная страница', 'url': '/'},
-        {"name": 'Регистрация', 'url': 'register'},
-        {"name": 'Войти', 'url': 'login'},
-        {"name": 'Создать пост', 'url': 'create_posts'}
-        ]
+
+
+class Menu(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(80), nullable=False)
+    url = db.Column(db.String(150), nullable=False)
 
 
 class Posts(db.Model):
@@ -55,20 +56,22 @@ class User(db.Model):
         return '<User %r>' % self.name
 
 
-
 @login_manager.user_loader
 def load_user(user_id):
     print("load_user")
     return UserLogin().fromDB(user_id, User)
 
+
 @app.route('/')
 def index():
     posts = Posts.query.all()
+    menu = Menu.query.all()
     return render_template('index.html', title='О сайте', menu=menu, posts=posts)
 
 
 @app.route('/register', methods=["POST", "GET"])
 def register():
+    menu = Menu.query.all()
     form = RegisterForm()
     if form.validate_on_submit():
         phone = form.phone.data
@@ -108,11 +111,13 @@ def register():
 @app.route('/profile/<name>')
 @login_required
 def profile(name):
+    menu = Menu.query.all()
     return render_template('profile.html', title='Профиль', menu=menu, name=name)
 
 
 @app.route('/login', methods=['POST', 'GET'])
 def login():
+    menu = Menu.query.all()
     form = LoginForm()
     if form.validate_on_submit():
         name = form.name.data
@@ -133,6 +138,7 @@ def login():
 
 @app.route('/password_change', methods=['POST', 'GET'])
 def password_change():
+    menu = Menu.query.all()
     form = PasswordChange()
     if form.validate_on_submit():
         phone = form.phone.data
@@ -149,9 +155,11 @@ def password_change():
         flash('Проверьте правильность номера телефона')
     return render_template('password_change.html', menu=menu, title='Смена пароля', form=form)
 
+
 @app.route('/logout')
 @login_required
 def logout():
+    menu = Menu.query.all()
     logout_user()
     flash("Вы вышли из аккаунта", "success")
     return redirect(url_for('login'))
@@ -160,6 +168,7 @@ def logout():
 @app.route('/create_posts', methods=['POST', 'GET'])
 @login_required
 def create_posts():
+    menu = Menu.query.all()
     form = CreatePosts()
     id = current_user.get_id().id
     if form.validate_on_submit():
@@ -185,19 +194,24 @@ def create_posts():
         flash('Пост с таким названием существует, выберите другое название')
     return render_template('create_posts.html', menu=menu, title='Создать пост', form=form)
 
+
 @app.route('/post/<url>')
 @login_required
 def post_detail(url):
+    menu = Menu.query.all()
     post = Posts.query.filter_by(url=url).first()
     return render_template('post_detail.html', menu=menu, title='Пост', post=post)
+
 
 @app.errorhandler(404)
 def pageNot(error):
     return ("Страница не найдена", 404)
 
+
 @app.route('/transfer')
 def transfer():
     return redirect(url_for('index'), 301)
+
 
 if __name__ == '__main__':
     app.run(debug=True)
